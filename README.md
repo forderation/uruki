@@ -1,4 +1,4 @@
-[![godoc](https://godoc.org/github.com/golang/mock/gomock?status.svg)](http://godoc.tkpd/pkg/github.com/tokopedia/tdk/go/uruki)
+[![godoc](https://godoc.org/github.com/golang/mock/gomock?status.svg)](https://pkg.go.dev/github.com/forderation/uruki)
 # URUKI
 
 <span style="color:pink">URUKI</span> (URi qUicK buIlder) uri / url parser wrapped with net/url. adjusted to safe mutate data with options of restricted scheme and automatically internal encode data. ref: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
