@@ -5,52 +5,44 @@ import (
 	"strings"
 )
 
-// setUrl setUrl parsing url and set internal url
-func (ub *UrukiBuilder) setUrl(rawUrl string) error {
-	uri, err := ub.parseUrl(rawUrl)
+// setURL setURL parsing url and set internal url
+func (ub *Builder) setURL(rawURL string) error {
+	uri, err := ub.parseURL(rawURL)
 	if err != nil {
 		return err
 	}
-	ub.mutex.Lock()
 	ub.url = uri
-	ub.mutex.Unlock()
 	return nil
 }
 
-// parseUrl parsing given uri and check if scheme in restricted if using restricted scheme
-func (ub *UrukiBuilder) parseUrl(rawUri string) (*url.URL, error) {
-	uri, err := url.Parse(rawUri)
+// parseURL parsing given uri and check if scheme in restricted if using restricted scheme
+func (ub *Builder) parseURL(rawURL string) (*url.URL, error) {
+	uri, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, err
 	}
 	// check it's an acceptable scheme
-	ub.mutex.RLock()
-	defer ub.mutex.RUnlock()
 	if len(ub.restrictedScheme) > 0 && !ub.restrictedScheme[uri.Scheme] {
-		return nil, ErrorInvalidSchemeUri
+		return nil, ErrorInvalidSchemeURI
 	}
 	return uri, nil
 }
 
 // setRestrictedScheme lookup restricted scheme save into map
-func (ub *UrukiBuilder) setRestrictedScheme(schemes []string) {
-	mapScheme := make(map[string]bool, 0)
+func (ub *Builder) setRestrictedScheme(schemes []string) {
+	mapScheme := make(map[string]bool)
 	for _, v := range schemes {
 		v = strings.ToLower(strings.TrimSpace(v))
 		mapScheme[v] = true
 	}
-	ub.mutex.Lock()
 	ub.restrictedScheme = mapScheme
-	ub.mutex.Unlock()
 }
 
 // queryEscapeAutomate escape all query parameter from existing url
-func (ub *UrukiBuilder) queryEscapeAutomate() {
-	ub.mutex.RLock()
+func (ub *Builder) queryEscapeAutomate() {
 	rawQuery := ub.url.RawQuery
-	ub.mutex.RUnlock()
 	if len(rawQuery) > 0 {
-		keyVal := strings.Split(rawQuery, AmpersandStr)
+		keyVal := strings.Split(rawQuery, ampersandStr)
 		buildRawResult := make([]string, 0)
 		for _, queryParam := range keyVal {
 			qv := strings.Split(queryParam, "=")
@@ -60,20 +52,30 @@ func (ub *UrukiBuilder) queryEscapeAutomate() {
 				if len(qv) > 1 {
 					v = qv[1]
 				}
+				qParsed, err := url.QueryUnescape(q)
+				if err != nil {
+					qParsed = v
+				} else {
+					qParsed = url.QueryEscape(qParsed)
+					qParsed = strings.ReplaceAll(qParsed, PlusEncoding, ub.defaultSpaceEncode)
+				}
 				vParsed, err := url.QueryUnescape(v)
 				if err != nil {
 					vParsed = v
 				} else {
 					vParsed = url.QueryEscape(vParsed)
-					vParsed = strings.ReplaceAll(vParsed, PlusStr, ub.defaultSpaceEncode.EncodeValue())
+					vParsed = strings.ReplaceAll(vParsed, PlusEncoding, ub.defaultSpaceEncode)
 				}
-				buildRawResult = append(buildRawResult, q+"="+vParsed)
+				buildRawResult = append(buildRawResult, qParsed+"="+vParsed)
 			}
 		}
 		if len(buildRawResult) > 0 {
-			ub.mutex.Lock()
-			ub.url.RawQuery = strings.Join(buildRawResult, AmpersandStr)
-			ub.mutex.Unlock()
+			ub.url.RawQuery = strings.Join(buildRawResult, ampersandStr)
 		}
 	}
+}
+
+// removeIndex remove index from string slice
+func removeIndex(s []string, index int) []string {
+	return append(s[:index], s[index+1:]...)
 }

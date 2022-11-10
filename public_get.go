@@ -5,52 +5,40 @@ import (
 	"strings"
 )
 
-// GetUrlResultUnescape get result url with unescape string
-func (ub *UrukiBuilder) GetUrlResultUnescape() string {
-	ub.mutex.RLock()
-	defer ub.mutex.RUnlock()
+// GetURLResultUnescape get result url with unescape string
+func (ub *Builder) GetURLResultUnescape() string {
 	uri := ub.url.String()
-	unescapeUrl, err := url.QueryUnescape(uri)
+	unescapeURL, err := url.QueryUnescape(uri)
 	if err != nil {
-		unescapeUrl = uri
+		unescapeURL = uri
 	}
-	return unescapeUrl
+	return unescapeURL
 }
 
-// GetUrlResult get url result with escaped option
-func (ub *UrukiBuilder) GetUrlResult() string {
-	ub.mutex.RLock()
-	defer ub.mutex.RUnlock()
+// GetURLResult get url result with escaped option
+func (ub *Builder) GetURLResult() string {
 	return ub.url.String()
 }
 
 // GetValueQuery get value of existing query parameter if any, return as decoded value
-func (ub *UrukiBuilder) GetValueQuery(key string) string {
-	ub.mutex.RLock()
-	defer ub.mutex.RUnlock()
+func (ub *Builder) GetValueQuery(key string) string {
 	query := ub.url.Query()
 	return query.Get(key)
 }
 
 // GetAllQueryValue get all key-value of existing query parameter, return as map key and decoded value
-func (ub *UrukiBuilder) GetAllQueryValue() map[string][]string {
-	ub.mutex.RLock()
-	defer ub.mutex.RUnlock()
+func (ub *Builder) GetAllQueryValue() map[string][]string {
 	return ub.url.Query()
 }
 
-// GetInternalUrl get internal url that already parsed by uruki
-func (ub *UrukiBuilder) GetInternalUrl() url.URL {
-	ub.mutex.RLock()
-	defer ub.mutex.RUnlock()
+// GetInternalURL get internal url that already parsed by uruki
+func (ub *Builder) GetInternalURL() url.URL {
 	return *ub.url
 }
 
 // GetPaths get each part of path in slice
-func (ub *UrukiBuilder) GetPaths() []string {
-	ub.mutex.RLock()
+func (ub *Builder) GetPaths() []string {
 	paths := strings.Split(ub.url.Path, "/")
-	ub.mutex.RUnlock()
 	pathsStrip := make([]string, 0)
 	for i, v := range paths {
 		if i == 0 {
@@ -62,8 +50,6 @@ func (ub *UrukiBuilder) GetPaths() []string {
 }
 
 // GetFullPath get full path. exclude base url, query parameter and fragment
-func (ub *UrukiBuilder) GetFullPath() string {
-	ub.mutex.RLock()
-	defer ub.mutex.RUnlock()
+func (ub *Builder) GetFullPath() string {
 	return ub.url.Path
 }

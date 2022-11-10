@@ -37,8 +37,9 @@ func Test_AddQueryParam(t *testing.T) {
 			name: "space trailing key automatically",
 			opt: []AddQueryParamOpt{
 				{
-					Key: " key ",
-					Val: "value",
+					Key:              " key ",
+					Val:              "value",
+					UseDefaultEncode: true,
 				},
 			},
 			wantRawQuery: "https://tokopedia.com/search?key=value",
@@ -47,8 +48,9 @@ func Test_AddQueryParam(t *testing.T) {
 			name: "space trailing key automatically",
 			opt: []AddQueryParamOpt{
 				{
-					Key: " key ",
-					Val: "value",
+					Key:              " key ",
+					Val:              "value",
+					UseDefaultEncode: true,
 				},
 			},
 			wantRawQuery: "https://tokopedia.com/search?key=value",
@@ -57,8 +59,9 @@ func Test_AddQueryParam(t *testing.T) {
 			name: "using default space encode",
 			opt: []AddQueryParamOpt{
 				{
-					Key: "key",
-					Val: "space value",
+					Key:              "key",
+					Val:              "space value",
+					UseDefaultEncode: true,
 				},
 			},
 			wantRawQuery: "https://tokopedia.com/search?key=space%20value",
@@ -104,7 +107,7 @@ func Test_AddQueryParam(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			ub, err := NewUrukiBuilder(UrukiOption{
+			ub, err := NewBuilder(Option{
 				URL:                "https://tokopedia.com/search",
 				DefaultSpaceEncode: PercentTwentyEncoding,
 			})
@@ -118,7 +121,7 @@ func Test_AddQueryParam(t *testing.T) {
 					t.Errorf("fail error test AddQueryParam() got %v want %v", err, tt.wantErr)
 				}
 			}
-			url := ub.GetUrlResult()
+			url := ub.GetURLResult()
 			if url != tt.wantRawQuery {
 				t.Errorf("fail value test AddQueryParam() got %v want %v", url, tt.wantRawQuery)
 			}
@@ -151,7 +154,7 @@ func Test_DeleteKeyQuery(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			ub, err := NewUrukiBuilder(UrukiOption{
+			ub, err := NewBuilder(Option{
 				URL:                tt.url,
 				DefaultSpaceEncode: PercentTwentyEncoding,
 			})
@@ -162,7 +165,7 @@ func Test_DeleteKeyQuery(t *testing.T) {
 			for _, key := range tt.keyDelete {
 				ub.DeleteKeyQuery(key)
 			}
-			url := ub.GetUrlResult()
+			url := ub.GetURLResult()
 			if url != tt.wantRawQuery {
 				t.Errorf("fail value test DeleteKeyQuery() got %v want %v", url, tt.wantRawQuery)
 			}
@@ -171,8 +174,8 @@ func Test_DeleteKeyQuery(t *testing.T) {
 }
 
 func Test_DeleteFragment(t *testing.T) {
-	wantUrl := "https://tokopedia.com/discovery"
-	ub, err := NewUrukiBuilder(UrukiOption{
+	wantURL := "https://tokopedia.com/discovery"
+	ub, err := NewBuilder(Option{
 		URL:                "https://tokopedia.com/discovery#top",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
@@ -181,15 +184,15 @@ func Test_DeleteFragment(t *testing.T) {
 		return
 	}
 	ub.DeleteFragment()
-	gotUrl := ub.GetUrlResult()
-	if wantUrl != gotUrl {
-		t.Errorf("fail test DeleteFragment() got %v want %v", gotUrl, wantUrl)
+	gotURL := ub.GetURLResult()
+	if wantURL != gotURL {
+		t.Errorf("fail test DeleteFragment() got %v want %v", gotURL, wantURL)
 	}
 }
 
 func Test_SetFragment(t *testing.T) {
-	wantUrl := "https://tokopedia.com/discovery#top+10"
-	ub, err := NewUrukiBuilder(UrukiOption{
+	wantURL := "https://tokopedia.com/discovery#top+10"
+	ub, err := NewBuilder(Option{
 		URL:                "https://tokopedia.com/discovery",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
@@ -198,15 +201,15 @@ func Test_SetFragment(t *testing.T) {
 		return
 	}
 	ub.SetFragment(SetFragmentOpt{Fragment: "top 10", SpaceEnc: PlusEncoding})
-	gotUrl := ub.GetUrlResult()
-	if wantUrl != gotUrl {
-		t.Errorf("fail test SetFragment() got %v want %v", gotUrl, wantUrl)
+	gotURL := ub.GetURLResult()
+	if wantURL != gotURL {
+		t.Errorf("fail test SetFragment() got %v want %v", gotURL, wantURL)
 	}
 }
 
 func Test_SetPath(t *testing.T) {
-	wantUrl := "https://www.tokopedia.com/iphoneos/acmic-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454"
-	ub, err := NewUrukiBuilder(UrukiOption{
+	wantURL := "https://www.tokopedia.com/iphoneos/acmic-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454"
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/acmic/acmic-usb-c-to-lightning-adapter-iphone-converter-connector-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
@@ -215,15 +218,15 @@ func Test_SetPath(t *testing.T) {
 		return
 	}
 	ub.SetPath("/iphoneos/acmic-konektor")
-	gotUrl := ub.GetUrlResult()
-	if wantUrl != gotUrl {
-		t.Errorf("fail test SetPath() got %v want %v", gotUrl, wantUrl)
+	gotURL := ub.GetURLResult()
+	if wantURL != gotURL {
+		t.Errorf("fail test SetPath() got %v want %v", gotURL, wantURL)
 	}
 }
 
-func Test_SetBaseUrl(t *testing.T) {
-	wantUrl := "tokopedia://acmic/acmic-usb-c-to-lightning-adapter-iphone-converter-connector-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454"
-	ub, err := NewUrukiBuilder(UrukiOption{
+func Test_SetBaseURL(t *testing.T) {
+	wantURL := "tokopedia://acmic/acmic-usb-c-to-lightning-adapter-iphone-converter-connector-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454"
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/acmic/acmic-usb-c-to-lightning-adapter-iphone-converter-connector-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 		RestrictScheme:     []string{"https", "tokopedia"},
@@ -232,13 +235,42 @@ func Test_SetBaseUrl(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	err = ub.SetBaseUrl("tokopedia://")
+	err = ub.SetBaseURL("tokopedia://")
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	gotUrl := ub.GetUrlResult()
-	if wantUrl != gotUrl {
-		t.Errorf("fail test SetBaseUrl() got %v want %v", gotUrl, wantUrl)
+	gotURL := ub.GetURLResult()
+	if wantURL != gotURL {
+		t.Errorf("fail test SetBaseURL() got %v want %v", gotURL, wantURL)
+	}
+}
+
+func Test_SetURL(t *testing.T) {
+	wantURL := "tokopedia://webview?caption=gopaylater%20-%20cicil#bottom"
+	ub, err := NewBuilder(Option{
+		URL:                  "https://www.tokopedia.com/acmic/acmic-usb-c-to-lightning-adapter-iphone-converter-connector-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454",
+		DefaultSpaceEncode:   PercentTwentyEncoding,
+		RestrictScheme:       []string{"https", "tokopedia"},
+		UseEscapeAutomateURL: true,
+	})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	err = ub.SetURL("tokopedia://webview?caption=gopaylater - cicil#bottom")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	gotURL := ub.GetURLResult()
+	if wantURL != gotURL {
+		t.Errorf("fail test setURL() got %v want %v", gotURL, wantURL)
+	}
+
+	// expect error because scheme changes into http
+	err = ub.SetURL("http://www.tokopedia.com/now")
+	if err == nil {
+		t.Errorf(`setURL("http://www.tokopedia.com/now") expect error`)
 	}
 }
