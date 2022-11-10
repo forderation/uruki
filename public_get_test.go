@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func Test_GetUrlResultUnescape(t *testing.T) {
-	ub, err := NewUrukiBuilder(UrukiOption{
+func Test_GetURLResultUnescape(t *testing.T) {
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/search?st=product&q=beras%20p%26g&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras+putih&navsource=tokonow",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
@@ -14,15 +14,15 @@ func Test_GetUrlResultUnescape(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	wantUrl := "https://www.tokopedia.com/search?st=product&q=beras p&g&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras putih&navsource=tokonow"
-	gotUrl := ub.GetUrlResultUnescape()
-	if wantUrl != gotUrl {
-		t.Errorf("fail test GetUrlResultUnescape() got %v want %v", gotUrl, wantUrl)
+	wantURL := "https://www.tokopedia.com/search?st=product&q=beras p&g&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras putih&navsource=tokonow"
+	gotURL := ub.GetURLResultUnescape()
+	if wantURL != gotURL {
+		t.Errorf("fail test GetURLResultUnescape() got %v want %v", gotURL, wantURL)
 	}
 }
 
-func Test_GetUrlResult(t *testing.T) {
-	ub, err := NewUrukiBuilder(UrukiOption{
+func Test_GetURLResult(t *testing.T) {
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/search?st=product&q=beras+putih&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras+putih&navsource=tokonow",
 		DefaultSpaceEncode: PlusEncoding,
 	})
@@ -30,15 +30,15 @@ func Test_GetUrlResult(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	wantUrl := "https://www.tokopedia.com/search?st=product&q=beras+putih&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras+putih&navsource=tokonow"
-	gotUrl := ub.GetUrlResult()
-	if wantUrl != gotUrl {
-		t.Errorf("fail test GetUrlResult() got %v want %v", gotUrl, wantUrl)
+	wantURL := "https://www.tokopedia.com/search?st=product&q=beras+putih&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras+putih&navsource=tokonow"
+	gotURL := ub.GetURLResult()
+	if wantURL != gotURL {
+		t.Errorf("fail test GetURLResult() got %v want %v", gotURL, wantURL)
 	}
 }
 
 func Test_GetValueQuery(t *testing.T) {
-	ub, err := NewUrukiBuilder(UrukiOption{
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/search?st=product&q=beras%20p%26g&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras+putih&navsource=tokonow",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
@@ -74,7 +74,7 @@ func Test_GetValueQuery(t *testing.T) {
 }
 
 func Test_GetAllQueryValue(t *testing.T) {
-	ub, err := NewUrukiBuilder(UrukiOption{
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/search?st=product&q=beras%20p%26g&srp_component_id=01.07.00.00&srp_page_id=1012&srp_page_title=beras+putih&navsource=tokonow&q=beras%20putih&source=",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
@@ -97,27 +97,27 @@ func Test_GetAllQueryValue(t *testing.T) {
 	}
 }
 
-func Test_GetInternalUrl(t *testing.T) {
-	rawUrl := "https://www.tokopedia.com/search?st=product&q=beras%20p%26g&srp_component_id=01.07.00.00&srp_page_id=1012@dhome&srp_page_title=beras+putih&navsource=tokonow&q=beras putih"
-	ub, err := NewUrukiBuilder(UrukiOption{
-		URL:                   rawUrl,
-		DefaultSpaceEncode:    PlusEncoding,
-		UseEscapeAutomateInit: true,
+func Test_GetInternalURL(t *testing.T) {
+	rawURL := "https://www.tokopedia.com/search?st=product&q=beras%20p%26g&srp_component_id=01.07.00.00&srp_page_id=1012@dhome&srp_page_title=beras+putih&navsource=tokonow&q=beras putih"
+	ub, err := NewBuilder(Option{
+		URL:                  rawURL,
+		DefaultSpaceEncode:   PlusEncoding,
+		UseEscapeAutomateURL: true,
 	})
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	uriUb := ub.GetInternalUrl()
-	wantUrl := "https://www.tokopedia.com/search?st=product&q=beras+p%26g&srp_component_id=01.07.00.00&srp_page_id=1012%40dhome&srp_page_title=beras+putih&navsource=tokonow&q=beras+putih"
-	gotUrl := uriUb.String()
-	if gotUrl != wantUrl {
-		t.Errorf("fail test GetInternalUrl() got %v want %v", gotUrl, wantUrl)
+	uriUb := ub.GetInternalURL()
+	wantURL := "https://www.tokopedia.com/search?st=product&q=beras+p%26g&srp_component_id=01.07.00.00&srp_page_id=1012%40dhome&srp_page_title=beras+putih&navsource=tokonow&q=beras+putih"
+	gotURL := uriUb.String()
+	if gotURL != wantURL {
+		t.Errorf("fail test GetInternalURL() got %v want %v", gotURL, wantURL)
 	}
 }
 
 func Test_GetPaths(t *testing.T) {
-	ub, err := NewUrukiBuilder(UrukiOption{
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/acmic/acmic-usb-c-to//lightning-adapter/iphone-converter/connector-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
@@ -133,7 +133,7 @@ func Test_GetPaths(t *testing.T) {
 }
 
 func Test_GetFullPath(t *testing.T) {
-	ub, err := NewUrukiBuilder(UrukiOption{
+	ub, err := NewBuilder(Option{
 		URL:                "https://www.tokopedia.com/acmic/acmic-usb-c-to//lightning-adapter/iphone-converter/connector-konektor?extParam=ivf%3Dfalse%26src%3Dsearch%26whid%3D13355454",
 		DefaultSpaceEncode: PercentTwentyEncoding,
 	})
