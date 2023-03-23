@@ -3,7 +3,6 @@ package uruki
 import (
 	"net/url"
 	"strings"
-	"sync"
 )
 
 // AddQueryParamOpt parameter for adding query params value in url
@@ -105,35 +104,29 @@ func (ub *Builder) SetFragment(opt SetFragmentOpt) {
 func (ub *Builder) DeleteKeyQuery(keyDelete string) {
 	keyVal := strings.Split(ub.url.RawQuery, ampersandStr)
 	buildRawResult := make([]string, len(keyVal))
-	wg := sync.WaitGroup{}
 	for i, queryParam := range keyVal {
-		wg.Add(1)
-		go func(qp string, idx int) {
-			defer wg.Done()
-			qv := strings.Split(qp, "=")
-			if len(qv) > 0 {
-				q := qv[0]
-				v := ""
-				if len(qv) > 1 {
-					v = qv[1]
-				}
-				qDel, err := url.QueryUnescape(q)
-				if err != nil {
-					qDel = q
-				}
-				if qDel != keyDelete {
-					buildRawResult[idx] = q + "=" + v
-				}
+		qv := strings.Split(queryParam, "=")
+		if len(qv) > 0 {
+			q := qv[0]
+			v := ""
+			if len(qv) > 1 {
+				v = qv[1]
 			}
-		}(queryParam, i)
-	}
-	wg.Wait()
-	for idx, v := range buildRawResult {
-		if v == "" {
-			buildRawResult = removeIndex(buildRawResult, idx)
+			qDel, err := url.QueryUnescape(q)
+			if err != nil {
+				qDel = q
+			}
+			if qDel != keyDelete {
+				buildRawResult[i] = q + "=" + v
+			}
 		}
 	}
-	if len(buildRawResult) > 0 {
-		ub.url.RawQuery = strings.Join(buildRawResult, ampersandStr)
+	cleanResult := []string{}
+	for _, v := range buildRawResult {
+		v = strings.TrimSpace(v)
+		if v != "" {
+			cleanResult = append(cleanResult, v)
+		}
 	}
+	ub.url.RawQuery = strings.Join(cleanResult, ampersandStr)
 }

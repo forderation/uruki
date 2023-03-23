@@ -74,8 +74,3 @@ func (ub *Builder) queryEscapeAutomate() {
 		}
 	}
 }
-
-// removeIndex remove index from string slice
-func removeIndex(s []string, index int) []string {
-	return append(s[:index], s[index+1:]...)
-}
